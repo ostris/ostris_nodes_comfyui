@@ -77,11 +77,11 @@ class OstrisTextBoxNode(OstrisBaseNode):
 
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("text",)
-    FUNCTION = "text_multiline"
+    FUNCTION = "text_box"
 
     CATEGORY = ostris_config.categories.text
 
-    def text_multiline(self, text):
+    def text_box(self, text):
         import io
         new_text = []
         for line in io.StringIO(text):

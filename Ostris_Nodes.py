@@ -1,4 +1,8 @@
-from .nodes.general import *
+from .utils.paths import fix_import_paths
+fix_import_paths()
+from .nodes.general import OstrisOneSeedNode, OstrisTextBoxNode
+from .nodes.batch_image_loader import OstrisBatchImageLoader
+
 
 ostris_node_list = [
     {
@@ -10,7 +14,12 @@ ostris_node_list = [
         "uid": "Text Box - Ostris",
         "class": OstrisTextBoxNode,
         "title": "Text Box",
-    }
+    },
+    # {
+    #     "uid": "Batch Image Loader - Ostris",
+    #     "class": OstrisBatchImageLoader,
+    #     "title": "Text Box",
+    # }
 ]
 
 # A dictionary that contains all nodes you want to export with their names
