@@ -18,6 +18,7 @@ class OstrisCategory:
     text = f"{root}/text"
     image = f"{root}/image"
     batch = f"{root}/batch"
+    llm = f"{root}/llm"
 
 
 class OstrisConfig:

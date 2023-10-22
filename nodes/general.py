@@ -75,8 +75,8 @@ class OstrisTextBoxNode(OstrisBaseNode):
             }
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
+    RETURN_TYPES = ("STRING", "TEXT")
+    RETURN_NAMES = ("string", "text")
     FUNCTION = "text_box"
 
     CATEGORY = ostris_config.categories.text
@@ -90,4 +90,4 @@ class OstrisTextBoxNode(OstrisBaseNode):
                     line = line.replace("\n", '')
                 new_text.append(line)
         new_text = "\n".join(new_text)
-        return (new_text,)
+        return (new_text, new_text)
