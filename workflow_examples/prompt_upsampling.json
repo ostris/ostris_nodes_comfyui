@@ -31,12 +31,12 @@
         "Node name for S&R": "LLM Pipe Loader - Ostris"
       },
       "widgets_values": [
-        "HuggingFaceH4/zephyr-7b-alpha"
+        "HuggingFaceH4/zephyr-7b-beta"
       ]
     },
     {
       "id": 11,
-      "type": "LLM Caption Upsampling - Ostris",
+      "type": "LLM Prompt Upsampling - Ostris",
       "pos": [
         365,
         -170
@@ -87,7 +87,7 @@
         }
       ],
       "properties": {
-        "Node name for S&R": "LLM Caption Upsampling - Ostris"
+        "Node name for S&R": "LLM Prompt Upsampling - Ostris"
       },
       "widgets_values": [
         ""

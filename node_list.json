@@ -1,0 +1,6 @@
+{
+  "One Seed - Ostris": "A universal seed node with numerous output formats",
+  "Text Box - Ostris": "Just a simple textbox for now",
+  "LLM Pipe Loader - Ostris": "Loads an LLM with diffusers from HuggingFace. Use with Prompt Upsampling",
+  "LLM Prompt Upsampling - Ostris": "Uses an LLM to expand your prompt into a more complex prompt with more descriptive detail."
+}

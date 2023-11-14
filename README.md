@@ -28,7 +28,7 @@ pip install --upgrade -r requirements.txt
     - **string** (STRING)
     - **text** (TEXT)
  
-### LLM Caption Upsampling (BETA)
+### LLM Prompt Upsampling (BETA)
 Based on the fantastic work of [sayakpaul/caption-upsampling](
 https://github.com/sayakpaul/caption-upsampling). It uses
 an LLM to expand your prompt into a more complex prompt with more descriptive detail.
@@ -37,8 +37,8 @@ an LLM to expand your prompt into a more complex prompt with more descriptive de
 mode but will still be VRAM hungry. 
 
 - **LLM Pipe Loader** - Loads the LLM pipeline to use
-  - **model_name** (STRING) Huggingface model name e.g. `HuggingFaceH4/zephyr-7b-alpha`
-- **LLM Caption Upsampling** - Upsamples a prompt
+  - **model_name** (STRING) Huggingface model name e.g. `HuggingFaceH4/zephyr-7b-beta`
+- **LLM Prompt Upsampling** - Upsamples a prompt
 
 
  Example:

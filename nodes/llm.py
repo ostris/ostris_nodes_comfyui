@@ -110,7 +110,7 @@ class OstrisLLMPipeLoader(OstrisBaseNode):
             "required": {
                 "model_name": (
                     "STRING", {
-                        "default": 'HuggingFaceH4/zephyr-7b-alpha',
+                        "default": 'HuggingFaceH4/zephyr-7b-beta',
                         "multiline": False
                     }
                 ),
@@ -152,7 +152,7 @@ class OstrisLLMPipeLoader(OstrisBaseNode):
         return (pipe,)
 
 
-class OstrisCaptionUpsampler(OstrisBaseNode):
+class OstrisPromptUpsampler(OstrisBaseNode):
     def __init__(self):
         super().__init__()
 
@@ -168,11 +168,11 @@ class OstrisCaptionUpsampler(OstrisBaseNode):
 
     RETURN_TYPES = ("STRING", "TEXT")
     RETURN_NAMES = ("string", "text")
-    FUNCTION = "upsample_caption"
+    FUNCTION = "upsample_prompt"
 
     CATEGORY = ostris_config.categories.llm
 
-    def upsample_caption(self, llm_pipe, string, seed):
+    def upsample_prompt(self, llm_pipe, string, seed):
         if llm_pipe is None:
             raise ValueError("Pipeline not loaded. Please call load_model() first.")
 
@@ -205,4 +205,10 @@ class OstrisCaptionUpsampler(OstrisBaseNode):
         if torch.cuda.is_available():
             torch.cuda.set_rng_state(cuda_rng_state)
         print(upsampled_captions)
-        return (upsampled_captions[0],)
+        return (upsampled_captions[0], upsampled_captions[0],)
+
+
+# For backwards compatibility
+class OstrisCaptionUpsampler(OstrisPromptUpsampler):
+    def __init__(self):
+        super().__init__()

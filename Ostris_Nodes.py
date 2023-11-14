@@ -1,7 +1,7 @@
 from .utils.paths import fix_import_paths
 fix_import_paths()
 from .nodes.general import OstrisOneSeedNode, OstrisTextBoxNode
-from .nodes.llm import OstrisLLMPipeLoader, OstrisCaptionUpsampler
+from .nodes.llm import OstrisLLMPipeLoader, OstrisPromptUpsampler
 from .nodes.batch_image_loader import OstrisBatchImageLoader
 
 
@@ -22,9 +22,9 @@ ostris_node_list = [
         "title": "LLM Pipe Loader",
     },
     {
-        "uid": "LLM Caption Upsampling - Ostris",
-        "class": OstrisCaptionUpsampler,
-        "title": "Caption Upsampling",
+        "uid": "LLM Prompt Upsampling - Ostris",
+        "class": OstrisPromptUpsampler,
+        "title": "Prompt Upsampling",
     },
     # {
     #     "uid": "Batch Image Loader - Ostris",
