@@ -3,7 +3,7 @@ import os
 from typing import List, Dict, Tuple
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, BitsAndBytesConfig
 
 from .base_node import OstrisBaseNode
 from ..settings.config import ostris_config
@@ -42,6 +42,14 @@ def _prepare_assistant_reply(assistant_output):
     output = assistant_output[0]["generated_text"]
     parts = output.rsplit("<|assistant|>", 1)
     assistant_reply = parts[1].strip() if len(parts) > 1 else None
+    # if the assistant also provided user side input, remove it
+    if assistant_reply and "<|user|>" in assistant_reply:
+        assistant_reply = assistant_reply.split("<|user|>")[0].strip()
+    if assistant_reply and "<|system|>" in assistant_reply:
+        assistant_reply = assistant_reply.split("<|system|>")[0].strip()
+
+    # remove any newlines
+    assistant_reply = assistant_reply.replace("\n", " ").strip()
     return assistant_reply
 
 
@@ -54,47 +62,44 @@ def _get_messages_for_chat() -> Tuple[Dict, List[Dict]]:
     """
     system_message = {
         "role": "system",
-        "content": """You are part of a team of bots that creates images. You work with an assistant bot that will draw anything you say in square brackets. For example, outputting "a beautiful morning in the woods with the sun peaking through the trees" will trigger your partner bot to output an image of a forest morning, as described. You will be prompted by people looking to create detailed, amazing images. The way to accomplish this is to take their short prompts and make them extremely detailed and descriptive.
+        "content": """\
+You are part of a team of bots that creates images. You work with an assistant bot that will draw anything you say. \
+For example, outputting "a beautiful morning in the woods with the sun peaking through the trees" \
+will trigger your partner bot to output an image of a forest morning, as described. \
+You be given simple prompts that you will upsample to create, amazing images. \
+Upsampling a prompt this is to take the short prompts and make them extremely detailed and descriptive while \
+maintaining all of the information from the original prompt.
 
-    There are a few rules to follow:
+There are a few rules to follow:
 
-    - You will only ever output a single image description per user request.
-    - Sometimes the user will request that you modify previous captions. In this case, you should refer to your previous conversations with the user and make the modifications requested.
-    - When modifications are requested, you should not simply make the description longer. You should refactor the entire description to integrate the suggestions.
-    - Other times the user will not want modifications, but instead want a new image. In this case, you should ignore your previous conversation with the user."
-    - Image descriptions must be between 15-300 words. Extra words will be ignored.
-    """,
+- You will only ever output a single image description per user request.
+- You will never use the same image description twice. You must always create very unique image descriptions.
+- You will ALWAYS include all of the information from the input prompt, but you will add more details to it.
+- Image descriptions must be between 15-300 words. Extra words will be ignored.
+- You must be creative and imaginative with your image descriptions. They must be unique and interesting.
+""",
     }
-    # - Image descriptions must be between 15-80 words. Extra words will be ignored.
 
     rest_of_the_message = [
         {
             "role": "user",
-            "content": "Create an imaginative image descriptive caption or modify an earlier caption for the user input: 'a man holding a sword'",
+            "content": "Upsample this prompt: 'a man holding a sword'",
         },
         {
             "role": "assistant",
-            "content": "a pale figure with long white hair stands in the center of a dark forest, holding a sword high above his head. the blade glows with a blue light , casting a soft glow on the trees and bushes surrounding him.",
+            "content": "a pale figure with long white hair stands in the center of a dark forest, holding a sword high above his head, the blade glows with a blue light, casting a soft glow on the trees and bushes surrounding him",
         },
         {
             "role": "user",
-            "content": "Create an imaginative image descriptive caption or modify an earlier caption for the user input : 'make the light red'",
+            "content": "Upsample this prompt: 'frog playing dominoes'",
         },
         {
             "role": "assistant",
-            "content": "a pale figure with long white hair stands in the center of a dark forest, holding a sword high above his head. the blade glows with a red light, casting a warm glow on the trees and bushes surrounding him.",
+            "content": "a green tree frog sits on a worn table playing a game of dominoes, across the table is an elderly raccoon smoking a cigar, the table is covered in a green cloth and drinks, and the frog is wearing a jacket and a pair of jeans, the scene is set in a forest, with a large tree in the background",
         },
         {
             "role": "user",
-            "content": "Create an imaginative image descriptive caption or modify an earlier caption for the user input : 'draw a frog playing dominoes'",
-        },
-        {
-            "role": "assistant",
-            "content": "a frog sits on a worn table playing a game of dominoes with an elderly raccoon. the table is covered in a green cloth, and the frog is wearing a jacket and a pair of jeans. The scene is set in a forest, with a large tree in the background.",
-        },
-        {
-            "role": "user",
-            "content": "Create an imaginative image descriptive caption or modify an earlier caption for the user input : '{caption}'",
+            "content": "Upsample this prompt: '{prompt}'",
         },
     ]
     return system_message, rest_of_the_message
@@ -126,29 +131,40 @@ class OstrisLLMPipeLoader(OstrisBaseNode):
     def load_llm_pipeline(self, model_name):
         MODELS_DIR = comfy_paths.models_dir
         cache = os.path.join(MODELS_DIR, 'llm')
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+        trust_remote_code = False
+        if model_name.startswith("stabilityai"):
+            trust_remote_code = True
+
+        quantization_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_compute_dtype=torch.float16,
+        )
 
         model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
-            trust_remote_code=False,
+            trust_remote_code=trust_remote_code,
             revision="main",
-            load_in_4bit=True,
-            cache_dir=cache
+            cache_dir=cache,
+            quantization_config=quantization_config
         )
-        tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True, cache_dir=cache)
+        try:
+            tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True, cache_dir=cache)
+        except:
+            tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=False, cache_dir=cache)
         pipe = pipeline(
             "text-generation",
             model=model,
             tokenizer=tokenizer,
             torch_dtype=torch.float16,
             device_map="auto",
-            # model_kwargs={
-            #     'load_in_4bit': True
-            # },
-            # cache_dir=cache
-
         )
+
+        # guess at chat template if there is none. This works for stablelm
+        if not tokenizer.chat_template:
+            tokenizer.chat_template = "{% for message in messages %}{% if message['role'] == 'user' %}<|user|>{{ message['content'] }}{% elif message['role'] == 'assistant' %}<|assistant|>{{ message['content'] }}{% elif message['role'] == 'system' %}<|system|>{{ message['content'] }}{% endif %}{% if not loop.last %}{{ '  ' }}{% endif %}{% endfor %}<|assistant|>"
         return (pipe,)
 
 
@@ -186,11 +202,11 @@ class OstrisPromptUpsampler(OstrisBaseNode):
         if torch.cuda.is_available():
             torch.cuda.manual_seed(seed_int)
 
-        captions = [string]
+        prompts = [string]
         upsampled_captions = []
-        for caption in captions:
+        for prompt in prompts:
             system_message, rest_of_the_message = _get_messages_for_chat()
-            updated_prompt = rest_of_the_message[-1]["content"].format(caption=caption)
+            updated_prompt = rest_of_the_message[-1]["content"].format(prompt=prompt)
             rest_of_the_message[-1]["content"] = updated_prompt
             final_message = make_final_message(
                 system_message, rest_of_the_message, debug=False
