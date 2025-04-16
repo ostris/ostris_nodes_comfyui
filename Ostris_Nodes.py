@@ -1,9 +1,10 @@
+
 from .utils.paths import fix_import_paths
 fix_import_paths()
 from .nodes.general import OstrisOneSeedNode, OstrisTextBoxNode
 from .nodes.llm import OstrisLLMPipeLoader, OstrisPromptUpsampler
 from .nodes.batch_image_loader import OstrisBatchImageLoader
-
+from .nodes.image import OstrisSaveImageDirect
 
 ostris_node_list = [
     {
@@ -17,7 +18,7 @@ ostris_node_list = [
         "title": "Text Box",
     },
     {
-        "uid": "LLM Pipe Loader - Ostris",
+        "uid": "LLM Pipe Loader - Ostris", 
         "class": OstrisLLMPipeLoader,
         "title": "LLM Pipe Loader",
     },
@@ -26,11 +27,16 @@ ostris_node_list = [
         "class": OstrisPromptUpsampler,
         "title": "Prompt Upsampling",
     },
-    # {
-    #     "uid": "Batch Image Loader - Ostris",
-    #     "class": OstrisBatchImageLoader,
-    #     "title": "Text Box",
-    # }
+    {
+        "uid": "Save Image Direct - Ostris",
+        "class": OstrisSaveImageDirect,
+        "title": "Save Image Direct",
+    },
+    {
+        "uid": "Batch Image Loader - Ostris",
+        "class": OstrisBatchImageLoader,
+        "title": "Text Box",
+    }
 ]
 
 # A dictionary that contains all nodes you want to export with their names

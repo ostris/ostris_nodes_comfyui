@@ -61,8 +61,8 @@ class OstrisBatchImageLoader(OstrisBaseNode):
         "IMAGE",
         "STRING",
         "STRING",
-        "STRING"
-        "STRING"
+        "STRING",
+        "STRING",
         "STRING"
     )
     RETURN_NAMES = (

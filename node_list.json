@@ -2,5 +2,7 @@
   "One Seed - Ostris": "A universal seed node with numerous output formats",
   "Text Box - Ostris": "Just a simple textbox for now",
   "LLM Pipe Loader - Ostris": "Loads an LLM with diffusers from HuggingFace. Use with Prompt Upsampling",
-  "LLM Prompt Upsampling - Ostris": "Uses an LLM to expand your prompt into a more complex prompt with more descriptive detail."
+  "LLM Prompt Upsampling - Ostris": "Uses an LLM to expand your prompt into a more complex prompt with more descriptive detail.",
+  "Save Image Direct - Ostris": "Allows you to save an image to any path along with a caption text file with it.",
+  "Batch Image Loader - Ostris": "Loads random images from a directory and their caption files if it exists."
 }
