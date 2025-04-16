@@ -1,0 +1,15 @@
+[project]
+name = "ostris_nodes_comfyui"
+description = "This is a collection of custom nodes for ComfyUI that I made for some QOL. I will be adding much more advanced ones in the future once I get more familiar with the API."
+version = "1.0.0"
+license = "LICENSE"
+dependencies = ["transformers>=4.34.1", "bitsandbytes"]
+
+[project.urls]
+Repository = "https://github.com/ostris/ostris_nodes_comfyui"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ostris_nodes_comfyui"
+Icon = ""
